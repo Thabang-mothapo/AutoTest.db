@@ -1,1 +1,54 @@
+USE master;
+GO
+-- Create the login
+IF NOT EXISTS (SELECT * FROM sys.server_principals WHERE name = 'Auto_user')
+BEGIN
+    CREATE LOGIN Auto_user WITH PASSWORD = 'SambePassword@1';
+    ALTER SERVER ROLE sysadmin ADD MEMBER Auto_user;
+END
+GO
 
+USE master;
+GO
+
+-- Create the database if it does not exist
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'AutoDBFirstName')
+BEGIN
+    CREATE DATABASE AutoDBFirstName;
+END
+GO
+
+USE AutoDBFirstName;
+GO
+
+-- Create user table if not exists
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'user')
+BEGIN
+    CREATE TABLE [user] (
+        ID INT IDENTITY(1,1) PRIMARY KEY,
+        Name NVARCHAR(50),
+        Surname NVARCHAR(50),
+        Email NVARCHAR(100) UNIQUE
+    );
+END
+GO
+
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'sp_InsertUser')
+BEGIN
+    EXEC('
+        CREATE PROCEDURE sp_InsertUser
+            @Name NVARCHAR(50),
+            @Surname NVARCHAR(50),
+            @Email NVARCHAR(100)
+        AS
+        BEGIN
+            INSERT INTO [user] (Name, Surname, Email)
+            VALUES (''John'', ''Doe'', ''john.doe@example.com'');
+        END
+    ');
+END
+GO
+
+
+-- Insert sample data
+EXEC sp_InsertUser 'John', 'Doe', 'john.doe@example.com';
