@@ -14,4 +14,4 @@ jobs:
 
       - name: Deploy Database & Table
         run: |
-          sqlcmd -S "tcp:0.tcp.pinggy.io,1433" -U Auto_user -P "SambePassword@1" -d master -i setup.sql
+          sqlcmd -S "tcp:0.tcp.pinggy.io,1433" -U Auto_user -P "SambePassword@1" -d master -i setup.sql || { echo "SQLCMD failed"; exit 1; }
